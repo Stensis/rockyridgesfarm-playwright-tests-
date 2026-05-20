@@ -12,21 +12,9 @@ const categories = [
   "grains-pantry",
 ];
 
-test.describe("Products API Tests", () => {
+test.describe("Product Categories API Tests", () => {
 
-  test("should fetch all products", async ({ request }) => {
-    const response = await request.get(
-      `${API_URL}?page=1&limit=24`
-    );
-
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
-
-    expect(body.page).toBe(1);
-    expect(body.products.length).toBeGreaterThan(0);
-  });
-
+  // Validate category filtering works correctly
   for (const category of categories) {
 
     test(`should fetch ${category} products`, async ({ request }) => {
@@ -50,4 +38,20 @@ test.describe("Products API Tests", () => {
 
   }
 
+  // Validate invalid category returns no products
+  test("should return no products for invalid category", async ({ request }) => {
+
+    const response = await request.get(
+      `${API_URL}?page=1&limit=24&categorySlug=wrong-category`
+    );
+
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+
+    expect(body.products.length).toBe(0);
+
+  });
+
 });
+
