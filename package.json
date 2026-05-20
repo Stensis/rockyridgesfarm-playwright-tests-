@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Stensis/rockyridgesfarm-playwright-tests-#readme",
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.60.0",
     "@types/node": "^25.7.0"
   }
