@@ -1,25 +1,9 @@
-import { test, expect, APIRequestContext } from "@playwright/test";
+import { test, expect } from "../../../playwright/fixtures";
 
 const BASE_URL = "https://api.rockyridgesfarm.com/api";
 
-async function getFirstProduct(request: APIRequestContext) {
-  const res = await request.get(`${BASE_URL}/products?page=1&limit=24`);
-  expect(res.status()).toBe(200);
-
-  const body = await res.json();
-  const products = body.products || body.data || body;
-
-  const product = products.find((item: any) => item.stockQty > 2);
-
-  expect(product).toBeTruthy();
-
-  return product;
-}
-
 test.describe("Cart API Tests", () => {
-  test("add item to cart", async ({ request }) => {
-    const product = await getFirstProduct(request);
-
+  test("add item to cart", async ({ request, product }) => {
     const res = await request.post(`${BASE_URL}/cart/items`, {
       data: {
         productId: product.id,
@@ -33,10 +17,7 @@ test.describe("Cart API Tests", () => {
     expect(body).toBeTruthy();
   });
 
-  test("update quantity", async ({ request }) => {
-    const product = await getFirstProduct(request);
-    const sessionId = crypto.randomUUID();
-
+  test("update quantity", async ({ request, product, sessionId }) => {
     const addRes = await request.post(`${BASE_URL}/cart/items`, {
       headers: {
         "x-session-id": sessionId,
@@ -64,10 +45,7 @@ test.describe("Cart API Tests", () => {
     expect(updateRes.status()).toBe(200);
   });
 
-  test("remove item from cart", async ({ request }) => {
-    const product = await getFirstProduct(request);
-    const sessionId = crypto.randomUUID();
-
+  test("remove item from cart", async ({ request, product, sessionId }) => {
     const addRes = await request.post(`${BASE_URL}/cart/items`, {
       headers: {
         "x-session-id": sessionId,
@@ -98,9 +76,7 @@ test.describe("Cart API Tests", () => {
     expect([200, 204, 404]).toContain(res.status());
   });
 
-  test("invalid quantity", async ({ request }) => {
-    const product = await getFirstProduct(request);
-
+  test("invalid quantity", async ({ request, product }) => {
     const res = await request.post(`${BASE_URL}/cart/items`, {
       data: {
         productId: product.id,
@@ -111,9 +87,7 @@ test.describe("Cart API Tests", () => {
     expect([400, 422]).toContain(res.status());
   });
 
-  test("duplicate products", async ({ request }) => {
-    const product = await getFirstProduct(request);
-
+  test("duplicate products", async ({ request, product }) => {
     await request.post(`${BASE_URL}/cart/items`, {
       data: {
         productId: product.id,
